@@ -5,7 +5,7 @@ import itertools
 import json
 
 FILE_PATH = "../data/parsed_data/news_paragraphs.json"
-OUT_FILE_PATH = "../data/processed_data/processed.json"
+OUT_FILE_PATH = "../data/processed_data/processed_before_NEMO.json"
 
 # regexes
 WEATHER_REGEXES = [
@@ -100,15 +100,11 @@ def main():
         lambda x: remove_regexes(x, all_regexes)
     )
 
-    # Punctuation cleaning
     df.loc[:, "paragraph"] = df.paragraph.apply(lambda x: clean_notes_and_inserts(x))
-    df.loc[:, "paragraph"] = df.paragraph.apply(lambda x: clean_punctuation(x))
 
-    with open(HEB_STOPWORDS_PATH) as f:
-        heb_stopwords = [x.rstrip() for x in f]
+    df = df[~df.paragraph.str.isspace()]
 
-    df.loc[:, "paragraph"] = df.paragraph.apply(lambda x: remove_stopwords(x,
-                                                                           CUSTOM_STOPWORDS + heb_stopwords[:int(len(heb_stopwords)/2)]))
+
     df.to_json(OUT_FILE_PATH)
 
 
